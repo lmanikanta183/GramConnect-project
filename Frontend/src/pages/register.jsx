@@ -100,7 +100,7 @@ export default function Register() {
       Object.keys(form).forEach((key) => {
         if (form[key] !== null && form[key] !== "") formData.append(key, form[key]);
       });
-      const res  = await fetch("http://localhost:5000/api/auth/register", { method: "POST", body: formData });
+      const res = await fetch("https://gramconnect-project.onrender.com/api/auth/register", { method: "POST", body: formData });
       const data = await res.json();
       if (!res.ok) { setError(data.msg || "Registration failed"); return; }
       alert("Registered successfully!");
