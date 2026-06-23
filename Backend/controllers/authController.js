@@ -261,6 +261,110 @@ const adminRegistrationEmail = (user) => `
 </html>
 `;
 
+const statusUpdateEmail = (user) => {
+  const isPositive = user.status === "Approved" || user.status === "Active";
+  const headerColor = isPositive ? "#059669" : "#dc2626";
+  const boxBg = isPositive ? "#f0fdf4" : "#fff1f2";
+  const boxBorder = isPositive ? "#10b981" : "#ef4444";
+  const boxText = isPositive ? "#065f46" : "#991b1b";
+  const heading = user.status === "Approved"
+    ? "your account has been approved! 🎉"
+    : user.status === "Active"
+    ? "your account has been reactivated! 🎉"
+    : user.status === "Rejected"
+    ? "your account was not approved"
+    : user.status === "Blocked"
+    ? "your account has been blocked"
+    : "your account status has changed";
+
+  return `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Account Status Update</title>
+  </head>
+  <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:40px 0;">
+      <tr>
+        <td align="center">
+          <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+            <!-- HEADER -->
+            <tr>
+              <td style="background:${headerColor};border-radius:16px 16px 0 0;padding:32px 40px;text-align:center;">
+                <p style="margin:0;font-size:24px;font-weight:800;color:#ffffff;letter-spacing:1px;">🌿 GramConnect</p>
+                <p style="margin:8px 0 0;color:rgba(255,255,255,0.85);font-size:13px;">Account Status Update</p>
+              </td>
+            </tr>
+
+            <!-- BODY -->
+            <tr>
+              <td style="background:#ffffff;padding:40px 40px 32px;">
+
+                <h2 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#0f172a;">
+                  Hi ${user.name}, ${heading}
+                </h2>
+                <p style="margin:0 0 24px;font-size:14px;color:#64748b;line-height:1.7;">
+                  Your GramConnect <strong style="color:#0f172a;text-transform:capitalize;">${user.role}</strong> account status is now:
+                </p>
+
+                <!-- STATUS BOX -->
+                <div style="background:${boxBg};border:2px solid ${boxBorder};border-radius:12px;padding:24px;text-align:center;margin:24px 0;">
+                  <p style="margin:0;font-size:20px;font-weight:800;color:${boxText};text-transform:uppercase;letter-spacing:2px;">${user.status}</p>
+                  ${(user.status === "Rejected" || user.status === "Blocked") && user.reason ? `<p style="margin:12px 0 0;font-size:13px;color:#c2410c;">Reason: ${user.reason}</p>` : ""}
+                </div>
+
+                ${isPositive ? `
+                <table cellpadding="0" cellspacing="0" width="100%" style="background:#eff6ff;border-radius:10px;border:1px solid #bfdbfe;margin-bottom:24px;">
+                  <tr>
+                    <td style="padding:16px 20px;">
+                      <p style="margin:0 0 4px;font-size:13px;font-weight:600;color:#1d4ed8;">✅ You're all set!</p>
+                      <p style="margin:0;font-size:13px;color:#3b82f6;line-height:1.7;">
+                        You can now log in to GramConnect and start using your ${user.role} dashboard.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+                ` : `
+                <p style="margin:0 0 24px;font-size:14px;color:#64748b;line-height:1.7;">
+                  If you believe this is a mistake, please contact our support team.
+                </p>
+                `}
+
+                <p style="font-size:13px;color:#94a3b8;line-height:1.7;margin:0;">
+                  Questions? Reach out at
+                  <a href="mailto:support@gramconnect.com" style="color:#10b981;text-decoration:none;">support@gramconnect.com</a>.
+                </p>
+
+              </td>
+            </tr>
+
+            <!-- FOOTER -->
+            <tr>
+              <td style="background:#f8fafc;border-radius:0 0 16px 16px;padding:24px 40px;border-top:1px solid #e2e8f0;text-align:center;">
+                <p style="margin:0 0 8px;font-size:12px;color:#94a3b8;">© 2026 GramConnect. All rights reserved.</p>
+                <p style="margin:0 0 8px;font-size:12px;color:#94a3b8;">
+                  <a href="#" style="color:#10b981;text-decoration:none;">Privacy Policy</a> &nbsp;·&nbsp;
+                  <a href="#" style="color:#10b981;text-decoration:none;">Terms of Service</a> &nbsp;·&nbsp;
+                  <a href="#" style="color:#10b981;text-decoration:none;">Support</a>
+                </p>
+                <p style="margin:0;font-size:11px;color:#cbd5e1;">This is an automated email. Please do not reply directly to this message.</p>
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+
+  </body>
+</html>
+`;
+};
+
 
 // ================= REGISTER =================
 exports.register = async (req, res) => {
@@ -415,6 +519,18 @@ exports.updateStatus = async (req, res) => {
       },
       { new: true }
     );
+
+    if (!user) return res.status(404).json({ msg: "User not found" });
+
+    // ── Send status update email (non-blocking) ──
+    if (["Approved", "Rejected", "Blocked", "Active"].includes(status)) {
+      sendEmail(
+        user.email,
+        `GramConnect Account ${status}`,
+        `Hi ${user.name}, your GramConnect account status is now: ${status}.`,
+        statusUpdateEmail(user)
+      ).catch((err) => console.error("Status update email failed:", err));
+    }
 
     res.json(user);
   } catch (err) {
@@ -574,5 +690,3 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ msg: err.message });
   }
 };
-
-
