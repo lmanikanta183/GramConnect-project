@@ -189,10 +189,10 @@ export default function AdminDashboard() {
   const [revenue, setRevenue] = useState(null);
   const [orders, setOrders] = useState([]);
 
-  const API = "http://localhost:5000/api/auth";
-  const ORDER_API = "http://localhost:5000/api/orders";
-  const BASE = "http://localhost:5000/uploads";
-
+  const API = "https://gramconnect-project.onrender.com/api/auth";
+const ORDER_API = "https://gramconnect-project.onrender.com/api/orders";
+const BASE = "https://gramconnect-project.onrender.com/uploads";
+  
   const fetchUsers = async () => {
     try { const res = await axios.get(`${API}/users`); setUsers(res.data); } catch (err) { console.error(err); }
   };
