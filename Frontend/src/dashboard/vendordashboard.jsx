@@ -1198,10 +1198,10 @@ export default function VendorDashboard() {
   <button
     onClick={() => {
       const token = localStorage.getItem("gc_token");
-      window.open(
-        `http://localhost:5000/api/orders/invoice/vendor-statement?token=${token}`,
-        "_blank"
-      );
+  window.open(
+  `https://gramconnect-project.onrender.com/api/orders/invoice/vendor-statement?token=${token}`,
+  "_blank"
+);
     }}
     className="pill-btn flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold"
     style={{
@@ -1443,7 +1443,7 @@ export default function VendorDashboard() {
                         <button
                           onClick={() => {
                             const token = localStorage.getItem("gc_token");
-                            window.open(`http://localhost:5000/api/orders/${o._id}/invoice?token=${token}`, "_blank");
+                           window.open(`https://gramconnect-project.onrender.com/api/orders/${o._id}/invoice?token=${token}`, "_blank");
                           }}
                           className="gc-btn gc-btn-sm"
                           style={{ background: "#05966910", color: "#059669", border: "1px solid #05966930" }}>
