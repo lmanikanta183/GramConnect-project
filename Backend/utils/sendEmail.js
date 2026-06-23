@@ -1,24 +1,25 @@
-const nodemailer = require("nodemailer");
-
 const sendEmail = async (to, subject, text, html = null) => {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    family: 4,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
     },
+    body: JSON.stringify({
+      from: "GramConnect <onboarding@resend.dev>",
+      to: [to],
+      subject: subject,
+      html: html || text,
+      text: text,
+    }),
   });
 
-  await transporter.sendMail({
-    from: `"GramConnect" <${process.env.EMAIL_USER}>`,
-    to,
-    subject,
-    text,
-    html: html || text,
-  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(`Resend error: ${JSON.stringify(errorData)}`);
+  }
+
+  return response.json();
 };
 
 module.exports = sendEmail;
