@@ -280,8 +280,8 @@ const isMultiVendor = uniqueVendors.length > 1;
     setLoadingFee(true);
     try {
       const token = localStorage.getItem("gc_token");
-      const res = await fetch("http://localhost:5000/api/orders/calculate-fees", {
-        method: "POST",
+      const res = await fetch("https://gramconnect-project.onrender.com/api/orders/calculate-fees", {
+      method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ vendorId: vendorIds[0], shippingCity: shippingCity.trim() }),
       });
@@ -1001,7 +1001,7 @@ const isMultiVendor = uniqueVendors.length > 1;
         <button
           onClick={() => {
             const token = localStorage.getItem("gc_token");
-            window.open(`http://localhost:5000/api/orders/invoice/all-delivered?token=${token}`, "_blank");
+            window.open(`https://gramconnect-project.onrender.com/api/orders/invoice/all-delivered?token=${token}`, "_blank");
           }}
           className="pill-btn flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold"
           style={{ background: "linear-gradient(135deg,#c9a84c,#e8d48e)", color: "#1c1610" }}
@@ -1151,7 +1151,7 @@ const isMultiVendor = uniqueVendors.length > 1;
     const updatedItems = await Promise.all(
       o.items.map(async (i) => {
         try {
-          const res = await fetch(`http://localhost:5000/api/products/${i.productId}`, {
+         const res = await fetch(`https://gramconnect-project.onrender.com/api/products/${i.productId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           const data = await res.json();
@@ -1186,7 +1186,7 @@ const isMultiVendor = uniqueVendors.length > 1;
                       <button
                         onClick={() => {
                           const token = localStorage.getItem("gc_token");
-                          window.open(`http://localhost:5000/api/orders/${o._id}/invoice?token=${token}`, "_blank");
+                          window.open(`https://gramconnect-project.onrender.com/api/orders/${o._id}/invoice?token=${token}`, "_blank");
                         }}
                         className="pill-btn text-xs px-4 py-2 rounded-lg"
                         style={{ background: "#16423120", color: "#34d399", border: "1px solid #16423140" }}>
