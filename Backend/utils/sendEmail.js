@@ -1,22 +1,23 @@
 const sendEmail = async (to, subject, text, html = null) => {
-  const response = await fetch("https://api.resend.com/emails", {
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+      "api-key": process.env.BREVO_API_KEY,
       "Content-Type": "application/json",
+      "Accept": "application/json",
     },
     body: JSON.stringify({
-      from: "GramConnect <onboarding@resend.dev>",
-      to: [to],
+      sender: { name: "GramConnect", email: "manilanka150@gmail.com" },
+      to: [{ email: to }],
       subject: subject,
-      html: html || text,
-      text: text,
+      htmlContent: html || `<p>${text}</p>`,
+      textContent: text,
     }),
   });
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(`Resend error: ${JSON.stringify(errorData)}`);
+    throw new Error(`Brevo error: ${JSON.stringify(errorData)}`);
   }
 
   return response.json();
