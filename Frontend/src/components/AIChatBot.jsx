@@ -541,7 +541,7 @@ export default function AIChatBot({ role = "customer", darkMode = true }) {
     const systemPrompt = SYSTEM_PROMPTS[role] + LANG_INSTRUCTION[lang];
 
     try {
-      const response = await fetch("http://localhost:5000/api/chat", {
+      const response = await fetch("https://gramconnect-project.onrender.com/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
